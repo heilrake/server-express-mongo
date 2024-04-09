@@ -1,14 +1,17 @@
-import { UserModel } from '../../../models/user-model';
-import HttpStatusCode from 'http-status-codes';
-import bcrypt from 'bcrypt';
-import { v4 } from 'uuid';
-import { tokenService } from './token';
-import { ApiErrorMessage } from '../../../utils/error-message';
-import { JwtPayload } from 'jsonwebtoken';
+import { UserModel } from "../../../models/user-model";
+import HttpStatusCode from "http-status-codes";
+import bcrypt from "bcrypt";
+import { v4 } from "uuid";
+import { tokenService } from "./token";
+import { ApiErrorMessage } from "../../../utils/error-message";
+import { JwtPayload } from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+import { ObjectId } from "mongodb";
 
+let prisma = new PrismaClient();
 class UserService {
   async registration(email: string, password: string) {
-    const candidate = await UserModel.findOne({ email });
+    const candidate = await prisma.user.findUnique({ where: { email } });
 
     if (candidate) {
       throw ApiErrorMessage.BadRequest({
@@ -18,30 +21,29 @@ class UserService {
     }
 
     const hashPassword = await bcrypt.hash(password, 8);
-    const activationLink = v4();
 
-    const user = await UserModel.create({
-      email,
-      password: hashPassword,
-      activationLink,
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashPassword,
+      },
     });
 
     const tokens = await tokenService.generateTokens({
       email,
-      _id: user._id,
-      isActivated: user.isActivated,
+      id: user.id,
     });
 
-    await tokenService.saveToken(user._id, tokens.refreshToken);
+    await tokenService.saveToken(user.id, tokens.refreshToken);
 
     return {
       ...tokens,
-      user: { email: user.email, id: user._id, isActivated: user.isActivated },
+      user: { email: user.email, id: user.id },
     };
   }
 
   async login(email: string, password: string) {
-    const user = await UserModel.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       throw ApiErrorMessage.BadRequest({
@@ -53,12 +55,12 @@ class UserService {
     const isPassEquals = await bcrypt.compare(password, user.password);
 
     if (!isPassEquals) {
-      throw new Error('Password is incorrect');
+      throw new Error("Password is incorrect");
     }
 
     const tokens = await tokenService.generateTokens(user);
 
-    await tokenService.saveToken(user._id, tokens.refreshToken);
+    await tokenService.saveToken(user.id, tokens.refreshToken);
 
     return { ...tokens, user };
   }
@@ -69,30 +71,32 @@ class UserService {
   }
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw new Error('This user is not authorized ');
+      throw new Error("This user is not authorized ");
     }
 
     const userData = await tokenService.validateRefreshToken(refreshToken);
 
     if (!userData) {
-      throw new Error('Token cant refresh');
+      throw new Error("Token cant refresh");
     }
 
     const tokenFromDb = await tokenService.findToken(refreshToken);
 
     if (!refreshToken || !tokenFromDb) {
-      throw new Error('This user is not authorized ');
+      throw new Error("This user is not authorized ");
     }
 
-    const user = await UserModel.findById((userData as JwtPayload)._id);
+    const user = await prisma.user.findUnique({
+      where: { id: (userData as JwtPayload).id },
+    });
 
     if (!user) {
-      throw new Error('This user not found');
+      throw new Error("This user not found");
     }
 
     const tokens = await tokenService.generateTokens(user);
 
-    await tokenService.saveToken(user._id, tokens.refreshToken);
+    await tokenService.saveToken(user.id, tokens.refreshToken);
 
     return { ...tokens, user };
   }

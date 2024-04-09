@@ -1,23 +1,23 @@
-import jwt from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
-import { tokenModel } from '../../../models/token-model';
+import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
+import { tokenModel } from "../../../models/token-model";
 
 class TokenService {
-  async generateTokens(payload: { email: string; _id: ObjectId; isActivated: boolean }) {
-    const { email, _id, isActivated } = payload;
+  async generateTokens(payload: { email: string; id: string }) {
+    const { email, id } = payload;
 
     const accessToken = jwt.sign(
-      { email, _id, isActivated },
-      process.env.SECRET_ACCESS_JWT || 'secret-access-key',
+      { email, id },
+      process.env.SECRET_ACCESS_JWT || "secret-access-key",
       {
-        expiresIn: '15m',
+        expiresIn: "15m",
       },
     );
     const refreshToken = jwt.sign(
-      { email, _id, isActivated },
-      process.env.SECRET_REFRESH_JWT || 'secret-refresh-key',
+      { email, id },
+      process.env.SECRET_REFRESH_JWT || "secret-refresh-key",
       {
-        expiresIn: '7d',
+        expiresIn: "7d",
       },
     );
 
@@ -29,7 +29,10 @@ class TokenService {
 
   async validateAccessToken(token: string) {
     try {
-      const userData = jwt.verify(token, process.env.SECRET_ACCESS_JWT || 'secret-access-key');
+      const userData = jwt.verify(
+        token,
+        process.env.SECRET_ACCESS_JWT || "secret-access-key",
+      );
 
       return userData;
     } catch (e) {
@@ -40,7 +43,10 @@ class TokenService {
 
   async validateRefreshToken(token: string) {
     try {
-      const userData = jwt.verify(token, process.env.SECRET_REFRESH_JWT || 'secret-refresh-key');
+      const userData = jwt.verify(
+        token,
+        process.env.SECRET_REFRESH_JWT || "secret-refresh-key",
+      );
 
       return userData;
     } catch (e) {
@@ -49,7 +55,7 @@ class TokenService {
     }
   }
 
-  async saveToken(userId: ObjectId, refreshToken: string) {
+  async saveToken(userId: string, refreshToken: string) {
     const tokenData = await tokenModel.findOne({ userId: userId });
 
     if (tokenData) {
