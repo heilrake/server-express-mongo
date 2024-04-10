@@ -1,14 +1,12 @@
-import { UserModel } from "../../../models/user-model";
 import HttpStatusCode from "http-status-codes";
 import bcrypt from "bcrypt";
 import { v4 } from "uuid";
 import { tokenService } from "./token";
 import { ApiErrorMessage } from "../../../utils/error-message";
 import { JwtPayload } from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-import { ObjectId } from "mongodb";
 
-let prisma = new PrismaClient();
+import { prisma } from "../../../utils/others";
+
 class UserService {
   async registration(email: string, password: string) {
     const candidate = await prisma.user.findUnique({ where: { email } });
@@ -102,7 +100,7 @@ class UserService {
   }
 
   async getProfile() {
-    const users = await UserModel.find();
+    const users = await prisma.user.findMany();
     return users;
   }
 }

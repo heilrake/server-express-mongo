@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
-import { ObjectId } from "mongodb";
-import { tokenModel } from "../../../models/token-model";
+import { prisma } from "../../../utils/others";
 
 class TokenService {
   async generateTokens(payload: { email: string; id: string }) {
@@ -56,24 +55,34 @@ class TokenService {
   }
 
   async saveToken(userId: string, refreshToken: string) {
-    const tokenData = await tokenModel.findOne({ userId: userId });
+    const tokenData = await prisma.token.findFirst({
+      where: { userId },
+    });
 
     if (tokenData) {
-      tokenData.refreshToken = refreshToken;
-      return tokenData.save();
+      return prisma.token.update({
+        where: {
+          id: tokenData.id,
+        },
+        data: { refreshToken },
+      });
     }
-    const token = await tokenModel.create({ userId: userId, refreshToken });
+    const token = await prisma.token.create({
+      data: { userId: userId, refreshToken },
+    });
 
     return token;
   }
 
   async removeToken(refreshToken: string) {
-    const tokenData = await tokenModel.deleteOne({ refreshToken });
+    const tokenData = await prisma.token.deleteMany({
+      where: { refreshToken },
+    });
     return tokenData;
   }
 
   async findToken(refreshToken: string) {
-    const tokenData = await tokenModel.findOne({ refreshToken });
+    const tokenData = prisma.token.findFirst({ where: { refreshToken } });
 
     return tokenData;
   }
