@@ -1,6 +1,5 @@
 import HttpStatusCode from "http-status-codes";
 import bcrypt from "bcrypt";
-import { v4 } from "uuid";
 import { tokenService } from "./token";
 import { ApiErrorMessage } from "../../../utils/error-message";
 import { JwtPayload } from "jsonwebtoken";

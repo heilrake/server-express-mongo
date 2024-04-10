@@ -33,6 +33,7 @@ const bootstrapServer = async () => {
 
   app.use("/api", appRouter);
   app.use("/graphql", expressMiddleware(server));
+
   app.use(ErrorMiddleware);
 
   try {

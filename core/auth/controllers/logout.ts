@@ -1,10 +1,10 @@
-import { logger } from '../../../logger';
-import express from 'express';
-import HttpStatusCode from 'http-status-codes';
-import { verifyEnvironmentServer } from '../../../utils/verify-enviroment';
-import { userService } from '../services/user';
+import { logger } from "../../../logger";
+import express from "express";
+import HttpStatusCode from "http-status-codes";
+import { verifyEnvironmentServer } from "../../../utils/verify-enviroment";
+import { userService } from "../services/user";
 
-const routeName = '/auth/logout';
+const routeName = "/auth/logout";
 
 export const logoutHandler = async (
   req: express.Request,
@@ -14,8 +14,6 @@ export const logoutHandler = async (
   const { isDevelopment } = verifyEnvironmentServer();
   try {
     const { refreshToken } = req.cookies;
-
-    console.log('refreshToken', refreshToken);
 
     if (isDevelopment) {
       logger.ServerDevelopmentLogger.info(
@@ -30,7 +28,7 @@ export const logoutHandler = async (
       );
     }
 
-    res.clearCookie('refreshToken');
+    res.clearCookie("refreshToken");
     return res.status(HttpStatusCode.OK).json({});
   } catch (error) {
     return next(error);

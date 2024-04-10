@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = "mongodb+srv://spemisp40:74h2qp5xxTZXVKLZ@jwt-auth.r0wcqlp.mongodb.net/jwt-auth"
+  url      = "DATABASE_URL"
 }
 
 model User {
@@ -18,11 +18,20 @@ model User {
   email    String  @unique
   password String
   Token    Token[]
+  posts    Post[]
 }
 
 model Token {
   id           String @id @default(auto()) @map("_id") @db.ObjectId
   userId       String @db.ObjectId
   refreshToken String
-  user         User   @relation(fields: [userId], references: [id])
+  User         User   @relation(fields: [userId], references: [id])
+}
+
+model Post {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  userId      String @db.ObjectId
+  User        User   @relation(fields: [userId], references: [id])
 }
