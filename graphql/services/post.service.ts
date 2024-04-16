@@ -5,7 +5,6 @@ export const getAllPosts = async () => {
 };
 
 export const getOnePost = async (id: string) => {
-  console.log(id);
   return await prisma.post.findUnique({ where: { id } });
 };
 

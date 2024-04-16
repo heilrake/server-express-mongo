@@ -20,6 +20,7 @@
     "@types/nodemailer": "^6.4.14",
     "@types/redis": "^4.0.11",
     "@types/uuid": "^9.0.8",
+    "apollo-log": "^1.1.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

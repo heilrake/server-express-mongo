@@ -1,4 +1,4 @@
-import HttpStatusCode from 'http-status-codes';
+import HttpStatusCode from "http-status-codes";
 
 type ApiErrorMessagePropsType = {
   statusCode: number;
@@ -18,14 +18,20 @@ export class ApiErrorMessage extends Error {
   }
 
   static UnauthorizedError() {
-    return new ApiErrorMessage(HttpStatusCode.UNAUTHORIZED, 'User is not authorize');
+    return new ApiErrorMessage(
+      HttpStatusCode.UNAUTHORIZED,
+      "User is not authorize",
+    );
   }
 
   static BadRequest({ statusCode, message }: ApiErrorMessagePropsType) {
     return new ApiErrorMessage(statusCode, message);
   }
 
-  static UnprocessableEntity({ statusCode, message }: ApiErrorMessagePropsType) {
+  static UnprocessableEntity({
+    statusCode,
+    message,
+  }: ApiErrorMessagePropsType) {
     return new ApiErrorMessage(statusCode, message);
   }
 }

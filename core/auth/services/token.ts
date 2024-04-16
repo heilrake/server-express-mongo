@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../../../utils/others";
 
 class TokenService {
-  async generateTokens(payload: { email: string; id: string }) {
+  generateTokens(payload: { email: string; id: string }) {
     const { email, id } = payload;
 
     const accessToken = jwt.sign(
       { email, id },
       process.env.SECRET_ACCESS_JWT || "secret-access-key",
       {
-        expiresIn: "15m",
+        expiresIn: "1m",
       },
     );
     const refreshToken = jwt.sign(
@@ -26,7 +26,7 @@ class TokenService {
     };
   }
 
-  async validateAccessToken(token: string) {
+  validateAccessToken(token: string) {
     try {
       const userData = jwt.verify(
         token,
@@ -35,7 +35,6 @@ class TokenService {
 
       return userData;
     } catch (e) {
-      console.log(e);
       return null;
     }
   }

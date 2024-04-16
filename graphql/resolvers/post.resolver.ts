@@ -5,8 +5,7 @@ export const postsResolver = {
     async getAllPosts() {
       return await getAllPosts();
     },
-    async getOnePost(id: string) {
-      console.log("1", id);
+    async getOnePost(_: any, { id }: { id: string }) {
       return await getOnePost(id);
     },
   },

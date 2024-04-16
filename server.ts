@@ -2,15 +2,16 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServer } from "@apollo/server";
 
 import { appRouter } from "./router";
 import { logger } from "./logger";
 import { initDataBase } from "./connection/db";
 import { ErrorMiddleware } from "./middlewares/error-middleware";
-import { expressMiddleware } from "@apollo/server/express4";
-import { ApolloServer } from "@apollo/server";
 
 import { typeDefs, resolvers } from "./graphql";
+import { authMiddleware } from "./middlewares/auth-middleware";
 
 dotenv.config();
 const app = express();
@@ -20,7 +21,12 @@ const bootstrapServer = async () => {
     typeDefs,
     resolvers,
   });
-  await server.start();
+  await server.start().then(() => {
+    logger.ServerDevelopmentLogger.info(
+      `📦 GraphQl ready at http://localhost:${process.env.PORT}/graphql `,
+    );
+  });
+
   await initDataBase();
   app.use(express.json());
   app.use(cookieParser());
@@ -39,8 +45,7 @@ const bootstrapServer = async () => {
   try {
     app.listen(process.env.PORT || 5001, () => {
       logger.ServerDevelopmentLogger.info(
-        `🚀 ExpressApp ready at http://localhost:${process.env.PORT} 
-        🚀 Graphql ready at http://localhost:${process.env.PORT}/graphql`,
+        `🚀 ExpressApp ready at http://localhost:${process.env.PORT}`,
       );
     });
   } catch (error) {
