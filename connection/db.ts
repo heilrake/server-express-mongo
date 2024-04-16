@@ -3,9 +3,7 @@ import mongoose from "mongoose";
 
 export const initDataBase = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://spemisp40:74h2qp5xxTZXVKLZ@jwt-auth.r0wcqlp.mongodb.net/",
-    );
+    await mongoose.connect(process.env.DB_URL);
     logger.ServerDevelopmentLogger.info(
       "🍿 MongoDb Database Connected: successfully",
     );
