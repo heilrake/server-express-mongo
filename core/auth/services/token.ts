@@ -2,7 +2,10 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../../../utils/others";
 
 class TokenService {
-  generateTokens(payload: { email: string; id: string }) {
+  generateTokens(payload: { email: string; id: string }): {
+    accessToken: string;
+    refreshToken: string;
+  } {
     const { email, id } = payload;
 
     const accessToken = jwt.sign(

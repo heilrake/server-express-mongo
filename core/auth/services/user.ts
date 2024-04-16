@@ -7,7 +7,14 @@ import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../../../utils/others";
 
 class UserService {
-  async registration(email: string, password: string) {
+  async registration(
+    email: string,
+    password: string,
+  ): Promise<{
+    user: { email: string; id: string };
+    accessToken: string;
+    refreshToken: string;
+  }> {
     const candidate = await prisma.user.findUnique({ where: { email } });
 
     if (candidate) {
@@ -26,7 +33,7 @@ class UserService {
       },
     });
 
-    const tokens = await tokenService.generateTokens({
+    const tokens = tokenService.generateTokens({
       email,
       id: user.id,
     });
@@ -39,7 +46,14 @@ class UserService {
     };
   }
 
-  async login(email: string, password: string) {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{
+    user: { id: string; email: string; password: string };
+    accessToken: string;
+    refreshToken: string;
+  }> {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
