@@ -14,7 +14,7 @@ import { typeDefs, resolvers } from "./graphql";
 import { authMiddleware } from "./middlewares/auth-middleware";
 
 dotenv.config();
-const app = express();
+export const app = express();
 
 const bootstrapServer = async () => {
   const server = new ApolloServer({
